@@ -56,7 +56,7 @@ public class MainPanel extends JPanel {
 		// Layout the controls
 		JPanel top = new JPanel(new FlowLayout(FlowLayout.LEADING));
 		// We'll put the widgets on the top
-		top.add(sBtn = new SelectButton());
+		top.add(sBtn);
 		top.add(targetTypeCombo);
 		top.add(go);
 		
@@ -102,6 +102,9 @@ public class MainPanel extends JPanel {
 				widgets.forEach(w -> w.setEnabled(true));
 			}
 		});
+		
+		// Create select button
+		sBtn = new SelectButton();
 		
 		// Track widgets to disable during processing
 		// This prevents spam clicking and we run the conversions off
