@@ -84,6 +84,7 @@ public class MainPanel extends JPanel {
 				
 				CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
 					try {
+						status.setText("Processing...");
 						List<ConvertResult> results = Converter.go(f, type);
 						status.setText("Processed " + results.size() + " files!");
 					}
