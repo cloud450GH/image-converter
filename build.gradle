@@ -1,0 +1,54 @@
+// Image converter
+
+// Initial version of this was written using Gradle 8.8 and Java 21
+
+plugins {
+	id 'java'
+	id 'application'
+}
+
+java {
+	// Eclipse seems to get confused with the toolchain
+//	toolchain {
+//		languageVersion = JavaLanguageVersion.of(21)
+//	}
+	
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
+}
+
+application {
+	mainClass.set("com.cloud450GH.image.converter.Main")
+}
+
+run {
+	workingDir = projectDir
+}
+
+// https://docs.gradle.org/current/userguide/declaring_repositories.html
+repositories {
+	mavenCentral()
+	//google()
+	
+	// Website: https://mvnrepository.com/
+	// Repo path: https://repo1.maven.org/maven2
+	maven {
+		url "https://repo1.maven.org/maven2"
+	}
+} // end repositories
+
+dependencies {
+
+	// MIT license
+	implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.16'
+	
+	// APL 2.0
+	implementation group: 'com.sksamuel.scrimage', name: 'scrimage-core', version: '4.2.0'
+	implementation group: 'com.sksamuel.scrimage', name: 'scrimage-webp', version: '4.2.0'
+	
+	// APL 2.0
+	implementation group: 'commons-io', name: 'commons-io', version: '2.16.1'
+	
+	// Google Guava - License APL 2.0
+	implementation group: 'com.google.guava', name: 'guava', version: '33.2.1-jre'
+}

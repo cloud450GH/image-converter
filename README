@@ -1,0 +1,13 @@
+This is a simple image conversion program written in Java.
+
+I've noticed there are several websites that will do this for you, however the
+logistics seem silly to me. Upload file, convert it, download it back again...
+
+So, I wanted to try just a simple program to do the conversion locally. I've
+banged out a simple version in an afternoon, but I may work on enhancing it
+further.
+
+I don't expect anyone to ever read this, but at least I can test out how this
+shows up in GitHub.
+
+Cheers!

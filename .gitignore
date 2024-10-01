@@ -1,0 +1,10 @@
+# Ignore Build directories
+build/
+
+# Ignore gradle dir
+.gradle/
+
+# Ignore eclipse files
+.settings/
+.project
+.classpath
