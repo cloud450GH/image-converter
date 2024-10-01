@@ -11,3 +11,10 @@ I don't expect anyone to ever read this, but at least I can test out how this
 shows up in GitHub.
 
 Cheers!
+
+HOW DO I USE THIS?!?!
+Yeah, I'll make this more user friendly later... but for now...
+Got Gradle? (8.8+)
+Got Java? (v21+, but 8+ probably works)
+If the answer to the above is "yes" then a simple "gradle run"
+after you get these files shoud work...
