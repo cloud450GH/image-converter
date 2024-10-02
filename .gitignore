@@ -5,6 +5,7 @@ build/
 .gradle/
 
 # Ignore eclipse files
+bin/
 .settings/
 .project
 .classpath

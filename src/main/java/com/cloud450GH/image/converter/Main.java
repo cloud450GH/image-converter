@@ -1,5 +1,7 @@
 package com.cloud450GH.image.converter;
 
+import org.greenrobot.eventbus.EventBus;
+
 import com.cloud450GH.image.converter.ui.MainWindow;
 import com.cloud450GH.image.converter.ui.MsgBox;
 
@@ -9,6 +11,8 @@ import com.cloud450GH.image.converter.ui.MsgBox;
  * author: cloud450GH on GitHub
  */
 public class Main {
+	
+	public static final EventBus SYNC_BUS = EventBus.getDefault();
 	
 	public static void main(String[] args) {
 		try {

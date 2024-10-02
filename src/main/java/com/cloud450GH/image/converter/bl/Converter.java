@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.FilenameUtils;
+import org.greenrobot.eventbus.EventBus;
 
 import com.cloud450GH.image.converter.ImageTypes;
 import com.cloud450GH.image.converter.ImageTypes.SupportedImageType;
@@ -51,12 +52,12 @@ public class Converter {
 		return writerMap.get(type);
 	}
 	
-	public static List<ConvertResult> go(File sourceFile, SupportedImageType targetType) throws IOException {
+	public static List<ConvertResult> go(File sourceFile, SupportedImageType targetType, EventBus bus) throws IOException {
 		if (sourceFile == null || !sourceFile.exists()) {
 			return Collections.singletonList(ConvertResult.FILE_NOT_FOUND);
 		}
 		
-		return sourceFile.isFile() ? Collections.singletonList(goFile(sourceFile, targetType)) : goDir(sourceFile, targetType);
+		return sourceFile.isFile() ? Collections.singletonList(goFile(sourceFile, targetType)) : goDir(sourceFile, targetType, bus);
 	}
 	
 	public static ConvertResult goFile(File sourceFile, SupportedImageType targetType) throws IOException {
@@ -84,6 +85,10 @@ public class Converter {
 	}
 	
 	public static List<ConvertResult> goDir(File sourceDir, SupportedImageType targetType) throws IOException {
+		return goDir(sourceDir, targetType, null);
+	}
+	
+	public static List<ConvertResult> goDir(File sourceDir, SupportedImageType targetType, EventBus bus) throws IOException {
 		if (sourceDir == null || !sourceDir.exists()) {
 			return Collections.singletonList(ConvertResult.DIR_NOT_FOUND);
 		}
@@ -101,15 +106,26 @@ public class Converter {
 		
 		List<ConvertResult> retVal = targetFiles.stream()
 				.map(f -> {
+					ConvertResult res;
 					try {
-						return goFile(f, targetType);
+						res = goFile(f, targetType);
 					}
 					catch (Throwable t) {
-						return ConvertResult.UNKNOWN;
+						res = ConvertResult.UNKNOWN;
 					}
+					maybeFireEvent(bus, f, res);
+					return res;
 				})
 				.collect(Collectors.toList());
 		
 		return retVal;
+	}
+	
+	protected static void maybeFireEvent(EventBus bus, File f, ConvertResult res) {
+		if (bus == null || f == null || res == null) {
+			return;
+		}
+		
+		bus.post(new FileProcessedEvent(f, res));
 	}
 }

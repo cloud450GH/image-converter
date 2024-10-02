@@ -3,6 +3,7 @@ package com.cloud450GH.image.converter.ui;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -16,9 +17,14 @@ import javax.swing.JPanel;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import com.cloud450GH.image.converter.ImageTypes.SupportedImageType;
+import com.cloud450GH.image.converter.Main;
 import com.cloud450GH.image.converter.bl.Converter;
 import com.cloud450GH.image.converter.bl.Converter.ConvertResult;
+import com.cloud450GH.image.converter.bl.FileProcessedEvent;
 
 /**
  * The UI panel for the app. Creates the controls, lays them out, responds to actions from
@@ -77,31 +83,35 @@ public class MainPanel extends JPanel {
 		// When the user wants to execute...
 		go = new JButton("Go");
 		go.addActionListener((evt) -> {
-			try {
-				widgets.forEach(w -> w.setEnabled(false));
-				File f = sBtn.getChooser().getSelectedFile();
-				SupportedImageType type = (SupportedImageType)targetTypeCombo.getSelectedItem();
-				
-				CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
-					try {
-						status.setText("Processing...");
-						List<ConvertResult> results = Converter.go(f, type);
-						status.setText("Processed " + results.size() + " files!");
-					}
-					catch (Throwable t) {
-						MsgBox.error(t.getMessage());
-						status.setText("Unexpected error occurred: " + t.getMessage());
-					}
-				});
-				future.join();
-			}
-			catch (Throwable t) {
+			widgets.forEach(w -> w.setEnabled(false));
+			status.setText("Processing...");
+			File f = sBtn.getChooser().getSelectedFile();
+			SupportedImageType type = (SupportedImageType)targetTypeCombo.getSelectedItem();
+			
+			CompletableFuture<List<ConvertResult>> future = CompletableFuture.supplyAsync(() -> {
+				try {
+					return Converter.go(f, type, Main.SYNC_BUS);
+				}
+				catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+			});
+			
+			future = future.exceptionally((t) -> {
 				MsgBox.error(t.getMessage());
-			}
-			finally {
+				status.setText("Unexpected error occurred: " + t.getMessage());
+				return null;
+			});
+			
+			future.thenAccept((results) -> {
+				if (results != null) {
+					status.setText("Processed " + results.size() + " files!");
+				}
 				widgets.forEach(w -> w.setEnabled(true));
-			}
+			});
 		});
+		
+		Main.SYNC_BUS.register(this);
 		
 		// Create select button
 		sBtn = new SelectButton();
@@ -113,5 +123,10 @@ public class MainPanel extends JPanel {
 		widgets.add(go);
 		widgets.add(targetTypeCombo);
 		widgets.add(sBtn);
+	}
+	
+	@Subscribe(threadMode = ThreadMode.POSTING)
+	public void onProcess(FileProcessedEvent evt) {
+		status.setText("Processed: " + evt.getFile().getName());
 	}
 }
