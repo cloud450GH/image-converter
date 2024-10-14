@@ -12,7 +12,7 @@ import com.cloud450GH.image.converter.ui.MsgBox;
  */
 public class Main {
 	
-	public static final EventBus SYNC_BUS = EventBus.getDefault();
+	public static final EventBus BUS = EventBus.getDefault();
 	
 	public static void main(String[] args) {
 		try {

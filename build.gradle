@@ -8,6 +8,23 @@ plugins {
 	id 'eclipse'
 }
 
+eclipse {
+	classpath {
+		// try to fix the classpath issues... it seems that buildship kind of sucks...
+		defaultOutputDir = new File('./build/classes')
+		file {
+			whenMerged { 
+				// use default Output for all source-folders. see also defaultOutputDir per project
+				entries.each { source ->
+					if (source.kind == 'src' && !source.path.startsWith('/')) { // only Source-folders in the project starting with '/' are project-references
+						source.output = defaultOutputDir
+					}
+				}
+			}
+		}
+	}
+}
+
 java {
 	// Eclipse seems to get confused with the toolchain
 //	toolchain {

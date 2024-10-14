@@ -18,7 +18,6 @@ import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 
 import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import com.cloud450GH.image.converter.ImageTypes.SupportedImageType;
 import com.cloud450GH.image.converter.Main;
@@ -90,7 +89,7 @@ public class MainPanel extends JPanel {
 			
 			CompletableFuture<List<ConvertResult>> future = CompletableFuture.supplyAsync(() -> {
 				try {
-					return Converter.go(f, type, Main.SYNC_BUS);
+					return Converter.go(f, type, Main.BUS);
 				}
 				catch (IOException e) {
 					throw new RuntimeException(e);
@@ -111,7 +110,7 @@ public class MainPanel extends JPanel {
 			});
 		});
 		
-		Main.SYNC_BUS.register(this);
+		Main.BUS.register(this);
 		
 		// Create select button
 		sBtn = new SelectButton();
@@ -125,7 +124,7 @@ public class MainPanel extends JPanel {
 		widgets.add(sBtn);
 	}
 	
-	@Subscribe(threadMode = ThreadMode.POSTING)
+	@Subscribe/*(threadMode = ThreadMode.POSTING)*/
 	public void onProcess(FileProcessedEvent evt) {
 		status.setText("Processed: " + evt.getFile().getName());
 	}
