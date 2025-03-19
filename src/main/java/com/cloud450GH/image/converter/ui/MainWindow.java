@@ -11,10 +11,9 @@ import javax.swing.JMenuItem;
 
 /**
  * Fairly simple main window.
- * 
+ * <p>
  * author: cloud450GH on GitHub
  */
-@SuppressWarnings("serial")
 public class MainWindow extends JFrame {
 
 	public static final Dimension DEFAULT_WINDOW_SIZE = new Dimension(450, 130);
@@ -32,6 +31,7 @@ public class MainWindow extends JFrame {
 		
 		this.setSize(DEFAULT_WINDOW_SIZE);
 		this.setTitle("Convert Image(s)");
+		this.setResizable(false);
 		
 		centerWindow();
 	}
@@ -43,18 +43,17 @@ public class MainWindow extends JFrame {
 		// Center window
 		Dimension winDim = getToolkit().getScreenSize();
 		int xLoc = winDim.width / 2 - this.getWidth() / 2;
-		int yLoc = winDim.height / 2 - this.getHeight() /2;
+		int yLoc = winDim.height / 2 - this.getHeight() / 2;
 		this.setLocation(xLoc, yLoc);
 	}
-	
+
+	@SuppressWarnings("unused")
 	protected void setupMenuBar() {
 		JMenuBar mb = new JMenuBar();
 		
 		JMenu menu = new JMenu("File");
 		JMenuItem mi = new JMenuItem("Quit");
-		mi.addActionListener(e -> {
-			System.exit(0);
-		});
+		mi.addActionListener(e -> System.exit(0));
 		
 		menu.add(mi);
 		mb.add(menu);

@@ -24,12 +24,13 @@ import com.sksamuel.scrimage.webp.WebpWriter;
 
 /**
  * Utility methods to do actual conversions between image types.
- * 
+ * <p>
  * author: cloud450GH on GitHub
  */
 public class Converter {
 
 	public enum ConvertResult {
+		CANCELED,
 		DIR_NOT_FOUND,
 		FILE_NOT_FOUND,
 		FILE_ALREADY_EXISTS,
@@ -37,7 +38,9 @@ public class Converter {
 		FILE_TYPE_MISSING,
 		UNKNOWN
 	}
-	
+
+	protected static boolean cancelProcessing = false;
+
 	protected static Map<SupportedImageType, ImageWriter> writerMap;
 	
 	static {
@@ -56,6 +59,8 @@ public class Converter {
 		if (sourceFile == null || !sourceFile.exists()) {
 			return Collections.singletonList(ConvertResult.FILE_NOT_FOUND);
 		}
+
+		cancelProcessing = false;
 		
 		return sourceFile.isFile() ? Collections.singletonList(goFile(sourceFile, targetType)) : goDir(sourceFile, targetType, bus);
 	}
@@ -84,11 +89,15 @@ public class Converter {
 		return ConvertResult.FILE_CREATED;
 	}
 	
-	public static List<ConvertResult> goDir(File sourceDir, SupportedImageType targetType) throws IOException {
+	public static List<ConvertResult> goDir(File sourceDir, SupportedImageType targetType) {
 		return goDir(sourceDir, targetType, null);
 	}
-	
-	public static List<ConvertResult> goDir(File sourceDir, SupportedImageType targetType, EventBus bus) throws IOException {
+
+	public static void cancel() {
+		cancelProcessing = true;
+	}
+
+	public static List<ConvertResult> goDir(File sourceDir, SupportedImageType targetType, EventBus bus) {
 		if (sourceDir == null || !sourceDir.exists()) {
 			return Collections.singletonList(ConvertResult.DIR_NOT_FOUND);
 		}
@@ -99,16 +108,20 @@ public class Converter {
 		
 		Collection<String> targetExts = ImageTypes.getSupportedExtensions();
 		targetExts.remove(ImageTypes.getExt(targetType));
-		
-		List<File> targetFiles = Stream.of(sourceDir.listFiles())
+
+		File[] files = sourceDir.listFiles();
+		if (files == null) {
+			return Collections.singletonList(ConvertResult.CANCELED);
+		}
+		List<File> targetFiles = Stream.of(files)
 				.filter(file -> targetExts.contains(FilenameUtils.getExtension(file.getName())))
-				.collect(Collectors.toList());
+				.toList();
 		
-		List<ConvertResult> retVal = targetFiles.stream()
+		return targetFiles.stream()
 				.map(f -> {
 					ConvertResult res;
 					try {
-						res = goFile(f, targetType);
+						res = !cancelProcessing ? goFile(f, targetType) : ConvertResult.CANCELED;
 					}
 					catch (Throwable t) {
 						res = ConvertResult.UNKNOWN;
@@ -117,8 +130,6 @@ public class Converter {
 					return res;
 				})
 				.collect(Collectors.toList());
-		
-		return retVal;
 	}
 	
 	protected static void maybeFireEvent(EventBus bus, File f, ConvertResult res) {

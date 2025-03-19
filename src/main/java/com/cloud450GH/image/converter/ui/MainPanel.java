@@ -28,10 +28,9 @@ import com.cloud450GH.image.converter.bl.FileProcessedEvent;
 /**
  * The UI panel for the app. Creates the controls, lays them out, responds to actions from
  * the user.
- * 
+ * <p>
  * author: cloud450GH on GitHub
  */
-@SuppressWarnings("serial")
 public class MainPanel extends JPanel {
 
 	protected SelectButton sBtn; // pick the file or directory
@@ -41,14 +40,15 @@ public class MainPanel extends JPanel {
 	protected JLabel status; // report status (success, error, whatever)
 	
 	protected JButton go; // Begin!
+
+	protected JButton stop;
 	
 	protected List<JComponent> widgets; // for setEnabled(false/true) when we start/stop conversion.
 	
 	public MainPanel() {
 		
 		// Just playing with borders
-		Border border = null;
-		border = BorderFactory.createEtchedBorder(EtchedBorder.RAISED);
+		Border border = BorderFactory.createEtchedBorder(EtchedBorder.RAISED);
 		//border = BorderFactory.createBevelBorder(BevelBorder.RAISED, new Color(12, 12, 12), new Color(200, 200, 200));
 		this.setBorder(border);
 		
@@ -64,6 +64,7 @@ public class MainPanel extends JPanel {
 		top.add(sBtn);
 		top.add(targetTypeCombo);
 		top.add(go);
+		top.add(stop);
 		
 		// We'll put a status/result text on the bottom
 		JPanel bottom = new JPanel(new FlowLayout(FlowLayout.LEADING));
@@ -83,6 +84,8 @@ public class MainPanel extends JPanel {
 		go = new JButton("Go");
 		go.addActionListener((evt) -> {
 			widgets.forEach(w -> w.setEnabled(false));
+			stop.setEnabled(true);
+
 			status.setText("Processing...");
 			File f = sBtn.getChooser().getSelectedFile();
 			SupportedImageType type = (SupportedImageType)targetTypeCombo.getSelectedItem();
@@ -107,6 +110,7 @@ public class MainPanel extends JPanel {
 					status.setText("Processed " + results.size() + " files!");
 				}
 				widgets.forEach(w -> w.setEnabled(true));
+				stop.setEnabled(false);
 			});
 		});
 		
@@ -114,6 +118,14 @@ public class MainPanel extends JPanel {
 		
 		// Create select button
 		sBtn = new SelectButton();
+
+		// Stop
+		stop = new JButton(("Stop"));
+		stop.setEnabled(false);
+		stop.addActionListener((evt) -> {
+			stop.setEnabled(false);
+			Converter.cancel();
+		});
 		
 		// Track widgets to disable during processing
 		// This prevents spam clicking and we run the conversions off

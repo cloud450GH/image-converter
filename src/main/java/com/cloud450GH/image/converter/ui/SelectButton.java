@@ -20,10 +20,9 @@ import com.cloud450GH.image.converter.ImageTypes;
 /**
  * A file/directory selection widget. Let's the user select a file or directory
  * and can be accessed by whatever UI is leveraging this widget.
- * 
+ * <p>
  * author: cloud450GH on GitHub
  */
-@SuppressWarnings("serial")
 public class SelectButton extends JPanel {
 
 	public static final String DEFAULT_LABEL = "Select...";
@@ -56,7 +55,7 @@ public class SelectButton extends JPanel {
 		this.setLayout(layout);
 		this.add(new JLabel("Image or Directory:"));
 		
-		fileButton.setPreferredSize(new Dimension(150, 25));
+		fileButton.setPreferredSize(new Dimension(100, 25));
 		this.add(fileButton);
 	}
 	
@@ -64,7 +63,9 @@ public class SelectButton extends JPanel {
 		File f = fileChooser.getSelectedFile();
 		String name = f != null ? f.getName() : DEFAULT_LABEL;
 		fileButton.setText(name);
-		fileButton.setToolTipText(f.getAbsolutePath());
+		if (f != null) {
+			fileButton.setToolTipText(f.getAbsolutePath());
+		}
 	}
 	
 	@Override
@@ -96,10 +97,8 @@ public class SelectButton extends JPanel {
 			}
 			
 			String extension = FilenameUtils.getExtension(file.getName());
-			if (extension != null) {
-				extension = extension.toLowerCase();
-			}
-			
+			extension = extension.toLowerCase();
+
 			return allowedExtensions.contains(extension);
 		}
 

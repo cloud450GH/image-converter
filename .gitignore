@@ -9,3 +9,6 @@ bin/
 .settings/
 .project
 .classpath
+
+# Ignore idea folder
+.idea
