@@ -41,6 +41,8 @@ public class Converter {
 
 	protected static boolean cancelProcessing = false;
 
+	protected static boolean parallelProcessing = true;
+
 	protected static Map<SupportedImageType, ImageWriter> writerMap;
 	
 	static {
@@ -73,16 +75,16 @@ public class Converter {
 		if (targetType == null) {
 			return ConvertResult.FILE_TYPE_MISSING;
 		}
-		
-		ImmutableImage image = ImmutableImage.loader().fromFile(sourceFile);
+
 		String newFileName = FilenameUtils.removeExtension(sourceFile.getName()) + ImageTypes.getDotExt(targetType);
 		File newPath = sourceFile.getParentFile().toPath().resolve(newFileName).toFile();
 		
 		if (newPath.exists()) {
-			// if this file exists, abort?
+			// if this file exists, return that result
 			return ConvertResult.FILE_ALREADY_EXISTS;
 		}
-		
+
+		ImmutableImage image = ImmutableImage.loader().fromFile(sourceFile);
 		ImageWriter writer = getWriter(targetType);
 		image.output(writer, newPath);
 		
@@ -95,6 +97,12 @@ public class Converter {
 
 	public static void cancel() {
 		cancelProcessing = true;
+	}
+
+	public static boolean isParallelProcessing() {return parallelProcessing;}
+
+	public static void setParallelProcessing(boolean pp) {
+		parallelProcessing = pp;
 	}
 
 	public static List<ConvertResult> goDir(File sourceDir, SupportedImageType targetType, EventBus bus) {
@@ -116,20 +124,23 @@ public class Converter {
 		List<File> targetFiles = Stream.of(files)
 				.filter(file -> targetExts.contains(FilenameUtils.getExtension(file.getName())))
 				.toList();
-		
-		return targetFiles.stream()
-				.map(f -> {
-					ConvertResult res;
-					try {
-						res = !cancelProcessing ? goFile(f, targetType) : ConvertResult.CANCELED;
-					}
-					catch (Throwable t) {
-						res = ConvertResult.UNKNOWN;
-					}
-					maybeFireEvent(bus, f, res);
-					return res;
-				})
-				.collect(Collectors.toList());
+
+		Stream<File> stream = parallelProcessing ?
+				targetFiles.parallelStream() :
+				targetFiles.stream();
+
+		return stream.map(f -> {
+			ConvertResult res;
+			try {
+					res = !cancelProcessing ? goFile(f, targetType) : ConvertResult.CANCELED;
+				}
+				catch (Throwable t) {
+					res = ConvertResult.UNKNOWN;
+				}
+				maybeFireEvent(bus, f, res);
+				return res;
+			})
+			.collect(Collectors.toList());
 	}
 	
 	protected static void maybeFireEvent(EventBus bus, File f, ConvertResult res) {

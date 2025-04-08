@@ -16,7 +16,7 @@ import javax.swing.JMenuItem;
  */
 public class MainWindow extends JFrame {
 
-	public static final Dimension DEFAULT_WINDOW_SIZE = new Dimension(450, 130);
+	public static final Dimension DEFAULT_WINDOW_SIZE = new Dimension(450, 150);
 	
 	public MainWindow() {
 		this.addWindowListener(new WindowAdapter() {

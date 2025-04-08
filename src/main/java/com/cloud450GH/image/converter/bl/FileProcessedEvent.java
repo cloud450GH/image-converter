@@ -4,17 +4,10 @@ import java.io.File;
 
 import com.cloud450GH.image.converter.bl.Converter.ConvertResult;
 
-public class FileProcessedEvent {
-
-	protected File f;
-	protected ConvertResult result;
-	
-	public FileProcessedEvent(File file, ConvertResult res) {
-		this.f = file;
-		this.result = res;
-	}
-	
-	public File getFile() {return f;}
-	
-	public ConvertResult getResult() {return result;}
+/**
+ * Simple record to indicate a file was processed and the result of its conversion.
+ * @param file - The file that was converted.
+ * @param result - The result of the conversion.
+ */
+public record FileProcessedEvent(File file, ConvertResult result) {
 }

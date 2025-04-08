@@ -4,16 +4,11 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 
@@ -42,6 +37,8 @@ public class MainPanel extends JPanel {
 	protected JButton go; // Begin!
 
 	protected JButton stop;
+
+	protected JCheckBox parallelCB;
 	
 	protected List<JComponent> widgets; // for setEnabled(false/true) when we start/stop conversion.
 	
@@ -65,6 +62,9 @@ public class MainPanel extends JPanel {
 		top.add(targetTypeCombo);
 		top.add(go);
 		top.add(stop);
+
+		JPanel middle = new JPanel(new FlowLayout(FlowLayout.LEADING));
+		middle.add(parallelCB);
 		
 		// We'll put a status/result text on the bottom
 		JPanel bottom = new JPanel(new FlowLayout(FlowLayout.LEADING));
@@ -72,6 +72,7 @@ public class MainPanel extends JPanel {
 		
 		this.setLayout(new GridLayout(0, 1));
 		this.add(top);
+		this.add(middle);
 		this.add(bottom);
 	}
 	
@@ -106,9 +107,7 @@ public class MainPanel extends JPanel {
 			});
 			
 			future.thenAccept((results) -> {
-				if (results != null) {
-					status.setText("Processed " + results.size() + " files!");
-				}
+				showResults(results);
 				widgets.forEach(w -> w.setEnabled(true));
 				stop.setEnabled(false);
 			});
@@ -119,13 +118,19 @@ public class MainPanel extends JPanel {
 		// Create select button
 		sBtn = new SelectButton();
 
-		// Stop
+		// Stop Button
 		stop = new JButton(("Stop"));
 		stop.setEnabled(false);
 		stop.addActionListener((evt) -> {
 			stop.setEnabled(false);
 			Converter.cancel();
 		});
+
+		parallelCB = new JCheckBox("Parallel Processing");
+		parallelCB.setSelected(Converter.isParallelProcessing());
+		parallelCB.addActionListener(evt ->
+				Converter.setParallelProcessing(parallelCB.isSelected())
+		);
 		
 		// Track widgets to disable during processing
 		// This prevents spam clicking and we run the conversions off
@@ -134,10 +139,37 @@ public class MainPanel extends JPanel {
 		widgets.add(go);
 		widgets.add(targetTypeCombo);
 		widgets.add(sBtn);
+		widgets.add(parallelCB);
+	}
+
+	protected void showResults(Collection<ConvertResult> results) {
+		Objects.requireNonNull(results);
+		int totalFiles = results.size();
+
+		StringBuilder sb = new StringBuilder();
+		sb.append(String.format("Processed %d files!", totalFiles));
+
+		// Count how many occurrences of each status we've seen
+		Map<ConvertResult, Integer> map = results.stream()
+				.collect(Collectors.toMap(
+						res -> res,
+						r -> 1,
+						Integer::sum));
+
+		for (var entry : map.entrySet()) {
+			int count = entry.getValue();
+			if (count > 0) {
+				sb.append(' ')
+					.append(Str.getLabel(entry.getKey()))
+					.append(String.format("(%d).", count));
+			}
+		}
+
+		status.setText(sb.toString());
 	}
 	
 	@Subscribe/*(threadMode = ThreadMode.POSTING)*/
 	public void onProcess(FileProcessedEvent evt) {
-		status.setText("Processed: " + evt.getFile().getName());
+		status.setText("Processed: " + evt.file().getName());
 	}
 }
