@@ -4,7 +4,7 @@ import javax.swing.JOptionPane;
 
 /**
  * Shorthand for message boxes.
- * 
+ * <br>
  * author: cloud450GH on GitHub
  */
 public class MsgBox {

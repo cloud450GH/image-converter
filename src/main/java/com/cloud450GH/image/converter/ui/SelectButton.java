@@ -1,24 +1,18 @@
 package com.cloud450GH.image.converter.ui;
 
-import java.awt.Dimension;
-import java.awt.FlowLayout;
+import com.cloud450GH.image.converter.ImageTypes;
+import org.apache.commons.io.FilenameUtils;
+
+import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+import java.awt.*;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.filechooser.FileFilter;
-
-import org.apache.commons.io.FilenameUtils;
-
-import com.cloud450GH.image.converter.ImageTypes;
-
 /**
- * A file/directory selection widget. Let's the user select a file or directory
+ * A file/directory selection widget. Lets the user select a file or directory
  * and can be accessed by whatever UI is leveraging this widget.
  * <p>
  * author: cloud450GH on GitHub

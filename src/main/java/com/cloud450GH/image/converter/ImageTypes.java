@@ -6,7 +6,7 @@ import java.util.Set;
 
 /**
  * Meta information about what image types we're going to support.
- * 
+ * <br>
  * author: cloud450GH on GitHub
  */
 public class ImageTypes {

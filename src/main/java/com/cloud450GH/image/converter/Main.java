@@ -7,7 +7,7 @@ import com.cloud450GH.image.converter.ui.MsgBox;
 
 /**
  * Super simple main.
- * 
+ * <br>
  * author: cloud450GH on GitHub
  */
 public class Main {

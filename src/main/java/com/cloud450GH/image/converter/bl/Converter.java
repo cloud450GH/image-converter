@@ -1,18 +1,5 @@
 package com.cloud450GH.image.converter.bl;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import org.apache.commons.io.FilenameUtils;
-import org.greenrobot.eventbus.EventBus;
-
 import com.cloud450GH.image.converter.ImageTypes;
 import com.cloud450GH.image.converter.ImageTypes.SupportedImageType;
 import com.sksamuel.scrimage.ImmutableImage;
@@ -21,6 +8,14 @@ import com.sksamuel.scrimage.nio.ImageWriter;
 import com.sksamuel.scrimage.nio.JpegWriter;
 import com.sksamuel.scrimage.nio.PngWriter;
 import com.sksamuel.scrimage.webp.WebpWriter;
+import org.apache.commons.io.FilenameUtils;
+import org.greenrobot.eventbus.EventBus;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Utility methods to do actual conversions between image types.
@@ -59,7 +54,7 @@ public class Converter {
 	
 	public static List<ConvertResult> go(File sourceFile, SupportedImageType targetType, EventBus bus) throws IOException {
 		if (sourceFile == null || !sourceFile.exists()) {
-			return Collections.singletonList(ConvertResult.FILE_NOT_FOUND);
+			return Collections.emptyList();
 		}
 
 		cancelProcessing = false;
@@ -90,7 +85,8 @@ public class Converter {
 		
 		return ConvertResult.FILE_CREATED;
 	}
-	
+
+	@SuppressWarnings("unused")
 	public static List<ConvertResult> goDir(File sourceDir, SupportedImageType targetType) {
 		return goDir(sourceDir, targetType, null);
 	}
@@ -114,15 +110,15 @@ public class Converter {
 			return Collections.singletonList(ConvertResult.FILE_TYPE_MISSING);
 		}
 		
-		Collection<String> targetExts = ImageTypes.getSupportedExtensions();
-		targetExts.remove(ImageTypes.getExt(targetType));
+		Collection<String> targetExtensions = ImageTypes.getSupportedExtensions();
+		targetExtensions.remove(ImageTypes.getExt(targetType));
 
 		File[] files = sourceDir.listFiles();
 		if (files == null) {
 			return Collections.singletonList(ConvertResult.CANCELED);
 		}
-		List<File> targetFiles = Stream.of(files)
-				.filter(file -> targetExts.contains(FilenameUtils.getExtension(file.getName())))
+		List<File> targetFiles = Arrays.stream(files)
+				.filter(file -> targetExtensions.contains(FilenameUtils.getExtension(file.getName())))
 				.toList();
 
 		Stream<File> stream = parallelProcessing ?
