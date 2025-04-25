@@ -1,5 +1,20 @@
 package com.cloud450GH.image.converter.ui;
 
+import com.cloud450GH.image.converter.ImageTypes.SupportedImageType;
+import com.cloud450GH.image.converter.Main;
+import com.cloud450GH.image.converter.bl.Converter;
+import com.cloud450GH.image.converter.bl.Converter.ConvertResult;
+import com.cloud450GH.image.converter.bl.FileProcessedEvent;
+import com.cloud450GH.image.converter.ui.i18n.Str;
+import com.cloud450GH.image.converter.ui.i18n.StrKeys;
+import org.greenrobot.eventbus.Subscribe;
+
+import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.EtchedBorder;
+import javax.swing.plaf.basic.BasicComboBoxRenderer;
+
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.io.File;
@@ -7,18 +22,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-
-import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.border.EtchedBorder;
-
-import org.greenrobot.eventbus.Subscribe;
-
-import com.cloud450GH.image.converter.ImageTypes.SupportedImageType;
-import com.cloud450GH.image.converter.Main;
-import com.cloud450GH.image.converter.bl.Converter;
-import com.cloud450GH.image.converter.bl.Converter.ConvertResult;
-import com.cloud450GH.image.converter.bl.FileProcessedEvent;
 
 /**
  * The UI panel for the app. Creates the controls, lays them out, responds to actions from
@@ -80,14 +83,16 @@ public class MainPanel extends JPanel {
 		// The various types we can convert to...
 		targetTypeCombo = new JComboBox<>(SupportedImageType.values());
 		targetTypeCombo.setSelectedItem(SupportedImageType.JPG);
+		//targetTypeCombo.setModel();
+		targetTypeCombo.setRenderer(new ImageTypeRenderer());
 		
 		// When the user wants to execute...
-		go = new JButton("Go");
+		go = new JButton(Str.t(StrKeys.BUTTON_GO));
 		go.addActionListener((evt) -> {
 			widgets.forEach(w -> w.setEnabled(false));
 			stop.setEnabled(true);
 
-			status.setText("Processing...");
+			status.setText(Str.t(StrKeys.STATUS_PROCESSING));
 			File f = sBtn.getChooser().getSelectedFile();
 			SupportedImageType type = (SupportedImageType)targetTypeCombo.getSelectedItem();
 			
@@ -102,7 +107,7 @@ public class MainPanel extends JPanel {
 			
 			future = future.exceptionally((t) -> {
 				MsgBox.error(t.getMessage());
-				status.setText("Unexpected error occurred: " + t.getMessage());
+				status.setText(Str.t(StrKeys.STATUS_UNEXPECTED_ERROR, t.getMessage()));
 				return null;
 			});
 			
@@ -119,21 +124,22 @@ public class MainPanel extends JPanel {
 		sBtn = new SelectButton();
 
 		// Stop Button
-		stop = new JButton(("Stop"));
+		stop = new JButton(Str.t(StrKeys.BUTTON_STOP));
 		stop.setEnabled(false);
 		stop.addActionListener((evt) -> {
 			stop.setEnabled(false);
 			Converter.cancel();
 		});
 
-		parallelCB = new JCheckBox("Parallel Processing");
+		parallelCB = new JCheckBox(Str.t(StrKeys.PARALLEL_PROCESSING));
+		parallelCB.setToolTipText(Str.t(StrKeys.PARALLEL_PROCESSING_TOOLTIP));
 		parallelCB.setSelected(Converter.isParallelProcessing());
 		parallelCB.addActionListener(evt ->
 				Converter.setParallelProcessing(parallelCB.isSelected())
 		);
 		
 		// Track widgets to disable during processing
-		// This prevents spam clicking and we run the conversions off
+		// This prevents spam clicking. We run the conversions off
 		// of the Swing thread so the program doesn't lock up.
 		widgets = new ArrayList<>();
 		widgets.add(go);
@@ -147,7 +153,7 @@ public class MainPanel extends JPanel {
 		int totalFiles = results.size();
 
 		StringBuilder sb = new StringBuilder();
-		sb.append(String.format("Processed %d files!", totalFiles));
+		sb.append(String.format(Str.t(StrKeys.STATUS_PROCESSED_FILES, totalFiles)));
 
 		// Count how many occurrences of each status we've seen
 		Map<ConvertResult, Integer> map = results.stream()
@@ -170,6 +176,23 @@ public class MainPanel extends JPanel {
 	
 	@Subscribe/*(threadMode = ThreadMode.POSTING)*/
 	public void onProcess(FileProcessedEvent evt) {
-		status.setText("Processed: " + evt.file().getName());
+		status.setText(Str.t(StrKeys.STATUS_FILE_PROCESSED, evt.file().getName()));
+	}
+
+	// Renderer for our combo box. Basic text for now.
+	protected static class ImageTypeRenderer implements ListCellRenderer<SupportedImageType> {
+
+		protected BasicComboBoxRenderer baseRenderer = new BasicComboBoxRenderer();
+
+		@Override
+		public Component getListCellRendererComponent(JList<? extends SupportedImageType> list, SupportedImageType value, int index, boolean isSelected, boolean cellHasFocus) {
+			Component retVal = baseRenderer.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+
+			if (value != null && retVal instanceof JLabel label) {
+				label.setText(Str.t(StrKeys.IMAGE_TYPE_PREFIX + value.toString().toLowerCase()));
+			}
+
+			return retVal;
+		}
 	}
 }

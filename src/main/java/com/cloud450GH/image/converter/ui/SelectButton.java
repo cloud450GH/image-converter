@@ -1,6 +1,8 @@
 package com.cloud450GH.image.converter.ui;
 
 import com.cloud450GH.image.converter.ImageTypes;
+import com.cloud450GH.image.converter.ui.i18n.Str;
+import com.cloud450GH.image.converter.ui.i18n.StrKeys;
 import org.apache.commons.io.FilenameUtils;
 
 import javax.swing.*;
@@ -19,8 +21,8 @@ import java.util.Set;
  */
 public class SelectButton extends JPanel {
 
-	public static final String DEFAULT_LABEL = "Select...";
-	public static final String DEFAULT_TOOLTIP = "Select an image file or a directory containing images.";
+	public static final String DEFAULT_LABEL = Str.t(StrKeys.SELECT_BUTTON);
+	public static final String DEFAULT_TOOLTIP = Str.t(StrKeys.SELECT_BUTTON_TOOLTIP);
 	
 	protected JButton fileButton;
 	protected JFileChooser fileChooser;
@@ -47,7 +49,7 @@ public class SelectButton extends JPanel {
 		
 		FlowLayout layout = new FlowLayout(FlowLayout.LEADING);
 		this.setLayout(layout);
-		this.add(new JLabel("Image or Directory:"));
+		this.add(new JLabel(Str.t(StrKeys.SELECT_BUTTON_LABEL)));
 		
 		fileButton.setPreferredSize(new Dimension(100, 25));
 		this.add(fileButton);
@@ -98,7 +100,7 @@ public class SelectButton extends JPanel {
 
 		@Override
 		public String getDescription() {
-			return "Supported Image Files";
+			return Str.t(StrKeys.SELECT_SUPPORTED_IMAGE_TYPES);
 		}
 	}
 }

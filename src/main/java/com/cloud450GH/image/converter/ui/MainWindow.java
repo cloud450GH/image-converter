@@ -1,13 +1,17 @@
 package com.cloud450GH.image.converter.ui;
 
+import com.cloud450GH.image.converter.ui.i18n.Str;
+import com.cloud450GH.image.converter.ui.i18n.StrKeys;
+
+import javax.swing.*;
+
 import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Fairly simple main window.
@@ -17,21 +21,44 @@ import javax.swing.JMenuItem;
 public class MainWindow extends JFrame {
 
 	public static final Dimension DEFAULT_WINDOW_SIZE = new Dimension(450, 150);
-	
+
+	public static final int TOOLTIP_DISMISS_DELAY_MS = 15000;
+
+	// Icon files, found in the resources folder
+	protected static final List<String> IMAGE_LIST = List.of(
+			"/images/app-image-24.png",
+			"/images/app-image-32.png",
+			"/images/app-image-48.png"
+	);
+
+	protected void setupIcons() {
+		List<Image> images = IMAGE_LIST.stream()
+				.map(getClass()::getResource)
+				.filter(Objects::nonNull)
+				.map(Toolkit.getDefaultToolkit()::getImage)
+				.filter(Objects::nonNull)
+				.toList();
+
+		if (!images.isEmpty()) {
+			setIconImages(images);
+		}
+	}
+
 	public MainWindow() {
-		this.addWindowListener(new WindowAdapter() {
+		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent we) {
 				System.exit(0);
 			}
 		});
+
+		setupIcons();
+
+		ToolTipManager.sharedInstance().setDismissDelay(TOOLTIP_DISMISS_DELAY_MS);
+		add(new MainPanel());
 		
-//		setupMenuBar();
-		
-		this.add(new MainPanel());
-		
-		this.setSize(DEFAULT_WINDOW_SIZE);
-		this.setTitle("Convert Image(s)");
-		this.setResizable(false);
+		setSize(DEFAULT_WINDOW_SIZE);
+		setTitle(Str.t(StrKeys.APP_TITLE));
+		setResizable(false);
 		
 		centerWindow();
 	}
@@ -44,20 +71,20 @@ public class MainWindow extends JFrame {
 		Dimension winDim = getToolkit().getScreenSize();
 		int xLoc = winDim.width / 2 - this.getWidth() / 2;
 		int yLoc = winDim.height / 2 - this.getHeight() / 2;
-		this.setLocation(xLoc, yLoc);
+		setLocation(xLoc, yLoc);
 	}
 
 	@SuppressWarnings("unused")
 	protected void setupMenuBar() {
 		JMenuBar mb = new JMenuBar();
 		
-		JMenu menu = new JMenu("File");
-		JMenuItem mi = new JMenuItem("Quit");
+		JMenu menu = new JMenu("[PH] File");
+		JMenuItem mi = new JMenuItem("[PH] Quit");
 		mi.addActionListener(e -> System.exit(0));
 		
 		menu.add(mi);
 		mb.add(menu);
 		
-		this.setJMenuBar(mb);
+		setJMenuBar(mb);
 	}
 }

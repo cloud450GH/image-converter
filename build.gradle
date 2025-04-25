@@ -6,7 +6,11 @@ plugins {
 	id 'java'
 	id 'application'
 	id 'eclipse'
+	id 'idea'
 }
+
+// Set the version from a simple text file
+project.version = rootProject.file('version.txt').text.trim()
 
 eclipse {
 	classpath {

@@ -36,7 +36,7 @@ public class Converter {
 
 	protected static boolean cancelProcessing = false;
 
-	protected static boolean parallelProcessing = true;
+	protected static boolean parallelProcessing = false;
 
 	protected static Map<SupportedImageType, ImageWriter> writerMap;
 	
@@ -117,8 +117,20 @@ public class Converter {
 		if (files == null) {
 			return Collections.singletonList(ConvertResult.CANCELED);
 		}
+
+		// Get the files in the directory
+		// Filter out files that do not match our supported extensions
+		// Use a map to remove duplicate files that have different extensions (e.g. "abc.jpg" "abc.gif")
+		// take the values of this process (File objects) and create the list.
 		List<File> targetFiles = Arrays.stream(files)
 				.filter(file -> targetExtensions.contains(FilenameUtils.getExtension(file.getName())))
+				.collect(Collectors.toMap(
+						f -> FilenameUtils.removeExtension(f.getName()),
+						f -> f,
+						(a, b) -> a)
+				)
+				.values()
+				.stream()
 				.toList();
 
 		Stream<File> stream = parallelProcessing ?
