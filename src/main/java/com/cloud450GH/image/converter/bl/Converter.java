@@ -38,7 +38,7 @@ public class Converter {
 
 	protected static boolean parallelProcessing = false;
 
-	protected static Map<SupportedImageType, ImageWriter> writerMap;
+	protected static final Map<SupportedImageType, ImageWriter> writerMap;
 	
 	static {
 		writerMap = new HashMap<>();

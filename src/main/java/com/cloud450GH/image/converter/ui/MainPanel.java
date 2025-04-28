@@ -182,7 +182,7 @@ public class MainPanel extends JPanel {
 	// Renderer for our combo box. Basic text for now.
 	protected static class ImageTypeRenderer implements ListCellRenderer<SupportedImageType> {
 
-		protected BasicComboBoxRenderer baseRenderer = new BasicComboBoxRenderer();
+		protected final BasicComboBoxRenderer baseRenderer = new BasicComboBoxRenderer();
 
 		@Override
 		public Component getListCellRendererComponent(JList<? extends SupportedImageType> list, SupportedImageType value, int index, boolean isSelected, boolean cellHasFocus) {
