@@ -1,9 +1,9 @@
 package com.cloud450GH.image.converter;
 
-import org.greenrobot.eventbus.EventBus;
-
 import com.cloud450GH.image.converter.ui.MainWindow;
 import com.cloud450GH.image.converter.ui.MsgBox;
+import com.formdev.flatlaf.FlatDarkLaf;
+import org.greenrobot.eventbus.EventBus;
 
 /**
  * Super simple main.
@@ -16,6 +16,9 @@ public class Main {
 	
 	public static void main(String[] args) {
 		try {
+			// FlatLaf Dark theme
+			FlatDarkLaf.setup();
+
 			// Create the window
 			MainWindow mw = new MainWindow();
 			mw.setVisible(true);

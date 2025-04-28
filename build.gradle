@@ -73,6 +73,10 @@ dependencies {
 	
 	// greenrobot's eventbus - APL 2.0
 	implementation("org.greenrobot:eventbus-java:3.3.1")
+
+	// https://www.formdev.com/flatlaf/
+	// APL 2.0
+	implementation("com.formdev:flatlaf:3.6")
 	
 	// Google Guava - License APL 2.0
 	//implementation group: 'com.google.guava', name: 'guava', version: '33.2.1-jre'

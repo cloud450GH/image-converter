@@ -20,7 +20,7 @@ import java.util.Objects;
  */
 public class MainWindow extends JFrame {
 
-	public static final Dimension DEFAULT_WINDOW_SIZE = new Dimension(450, 150);
+	public static final Dimension DEFAULT_WINDOW_SIZE = new Dimension(480, 150);
 
 	public static final int TOOLTIP_DISMISS_DELAY_MS = 15000;
 
