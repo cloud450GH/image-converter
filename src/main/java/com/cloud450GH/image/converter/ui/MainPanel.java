@@ -85,6 +85,7 @@ public class MainPanel extends JPanel {
 		targetTypeCombo.setSelectedItem(SupportedImageType.JPG);
 		//targetTypeCombo.setModel();
 		targetTypeCombo.setRenderer(new ImageTypeRenderer());
+		targetTypeCombo.setToolTipText(Str.t(StrKeys.IMAGE_TYPE_TOOLTIP));
 		
 		// When the user wants to execute...
 		go = new JButton(Str.t(StrKeys.BUTTON_GO));
@@ -167,7 +168,7 @@ public class MainPanel extends JPanel {
 			if (count > 0) {
 				sb.append(' ')
 					.append(Str.getLabel(entry.getKey()))
-					.append(String.format("(%d).", count));
+					.append(String.format(" (%d).", count));
 			}
 		}
 

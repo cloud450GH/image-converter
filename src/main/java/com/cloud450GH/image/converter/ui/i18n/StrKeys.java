@@ -14,6 +14,7 @@ public class StrKeys {
 	public static final String SELECT_SUPPORTED_IMAGE_TYPES = "select.supported.image.types";
 
 	public static final String IMAGE_TYPE_PREFIX = "imagetype.";
+	public static final String IMAGE_TYPE_TOOLTIP = "imagetype.tooltip";
 
 	public static final String PARALLEL_PROCESSING = "parallel.processing";
 	public static final String PARALLEL_PROCESSING_TOOLTIP = "parallel.processing.tooltip";
